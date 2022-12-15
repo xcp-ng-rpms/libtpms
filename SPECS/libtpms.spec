@@ -16,6 +16,8 @@ Source0: libtpms-0.9.5.tar.gz
 BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig gawk sed
 BuildRequires:  automake autoconf libtool bash coreutils gcc-c++
+# XCP-ng: add epel-rpm-macros for %%ldconfig_scriptlets
+BuildRequires:  epel-rpm-macros
 %{?_cov_buildrequires}
 
 %description
