@@ -1,0 +1,28 @@
+From 353e835caab0b59bdcf0040daabe7046b4d91709 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Sat, 28 May 2022 13:59:02 -0400
+Subject: [PATCH 7/7] tpm2: Expect TPM_SUCCESS from tpm_io_getlocality()
+ callback function
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm_tpm2_interface.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/tpm_tpm2_interface.c b/src/tpm_tpm2_interface.c
+index 757ff00..dd2fe3d 100644
+--- a/src/tpm_tpm2_interface.c
++++ b/src/tpm_tpm2_interface.c
+@@ -188,7 +188,8 @@ static TPM_RESULT TPM2_Process(unsigned char **respbuffer, uint32_t *resp_size,
+     if (cbs->tpm_io_getlocality) {
+         TPM_MODIFIER_INDICATOR locty;
+ 
+-        locality = cbs->tpm_io_getlocality(&locty, 0);
++        /* called function is trusted and must return valid value */
++        cbs->tpm_io_getlocality(&locty, 0);
+ 
+         locality = locty;
+     }
+-- 
+2.31.1
+

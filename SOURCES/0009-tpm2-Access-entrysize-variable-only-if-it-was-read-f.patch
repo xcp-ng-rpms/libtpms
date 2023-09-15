@@ -1,0 +1,46 @@
+From b6b8506bceea4c22a92d0ff6c6f94e70fecf25a0 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Sat, 28 May 2022 14:07:28 -0400
+Subject: [PATCH 9/9] tpm2: Access entrysize variable only if it was read from
+ buffer (Coverity)
+
+Only access the entrysize variable if it was read from the buffer. In case
+of an error just head towards the exit. Previously, an error would also
+have lead the function to do no more useful processing and exited it with
+an error code bug Coverity complains that the entrysize variable would be
+access while it wasn't initialized.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm2/NVMarshal.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/tpm2/NVMarshal.c b/src/tpm2/NVMarshal.c
+index 4b88cf9..963da30 100644
+--- a/src/tpm2/NVMarshal.c
++++ b/src/tpm2/NVMarshal.c
+@@ -4641,7 +4641,8 @@ USER_NVRAM_Unmarshal(BYTE **buffer, INT32 *size)
+         }
+         if (rc == TPM_RC_SUCCESS) {
+             rc = UINT32_Unmarshal(&entrysize, buffer, size);
+-
++        }
++        if (rc == TPM_RC_SUCCESS) {
+             /* the entrysize also depends on the sizeof(nvi); we may have to
+                update it if sizeof(nvi) changed between versions */
+             entrysize_offset = o;
+@@ -4649,9 +4650,8 @@ USER_NVRAM_Unmarshal(BYTE **buffer, INT32 *size)
+             offset = sizeof(UINT32);
+             if (entrysize == 0)
+                 break;
+-        }
+-        /* 2nd: handle */
+-        if (rc == TPM_RC_SUCCESS) {
++
++            /* 2nd: handle */
+             rc = TPM_HANDLE_Unmarshal(&handle, buffer, size);
+         }
+ 
+-- 
+2.31.1
+

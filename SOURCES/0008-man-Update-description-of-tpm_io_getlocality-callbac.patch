@@ -1,0 +1,35 @@
+From 4923e9d67a108bf634ae8155c2c0f46384a5d7b2 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Sat, 28 May 2022 14:00:02 -0400
+Subject: [PATCH 8/8] man: Update description of tpm_io_getlocality callback
+ function
+
+Update the description of the tpm_io_getlocality() callback function
+that the TPM 2 code invokes to get the currently active locality.
+It is expected that the called software is trusted and returns a valid
+locality number at all times and thus also always return TPM_SUCCESS.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ man/man3/TPMLIB_RegisterCallbacks.pod | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/man/man3/TPMLIB_RegisterCallbacks.pod b/man/man3/TPMLIB_RegisterCallbacks.pod
+index 0f698b9..856fc4f 100644
+--- a/man/man3/TPMLIB_RegisterCallbacks.pod
++++ b/man/man3/TPMLIB_RegisterCallbacks.pod
+@@ -164,8 +164,9 @@ under which a command is supposed to be executed. The implementing function
+ should return the number of the locality by writing it into the 
+ B<localityModifier> pointer.
+ 
+-Upon success this function should return B<TPM_SUCCESS>, a failure code
+-otherwise.
++This function is expected to return B<TPM_SUCCESS> along with a valid
++locality number. The program implementing the called function is trusted to
++manage locality numbers correctly.
+ 
+ The default implementation returns 0 as the locality.
+ 
+-- 
+2.31.1
+
