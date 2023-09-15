@@ -1,0 +1,36 @@
+From 6a919f1c6ad55ab491622c259e69c93925156922 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Sat, 28 May 2022 14:23:42 -0400
+Subject: [PATCH 10/10] tpm2: Do not access variable if it could not be read
+ from buffer (Coverity)
+
+Exit the loop when the variable could not be filled with data from the
+byte stream. This avoids accessing the variable 'element' in case it
+wasn't initialized. The old could would have accessed the possibly
+uninitialized variable but exited the loop immediately after.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm2/NVMarshal.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/tpm2/NVMarshal.c b/src/tpm2/NVMarshal.c
+index 963da30..f01511b 100644
+--- a/src/tpm2/NVMarshal.c
++++ b/src/tpm2/NVMarshal.c
+@@ -1306,8 +1306,11 @@ STATE_RESET_DATA_Unmarshal(STATE_RESET_DATA *data, BYTE **buffer, INT32 *size)
+         if (hdr.version <= 3) {
+             /* version <= 3 was writing an array of UINT8 */
+             UINT8 element;
+-            for (i = 0; i < array_size && rc == TPM_RC_SUCCESS; i++) {
++            for (i = 0; i < array_size; i++) {
+                 rc = UINT8_Unmarshal(&element, buffer, size);
++                if (rc != TPM_RC_SUCCESS)
++                    break;
++
+                 data->contextArray[i] = element;
+             }
+             s_ContextSlotMask = 0xff;
+-- 
+2.31.1
+

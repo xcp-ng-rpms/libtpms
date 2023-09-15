@@ -1,0 +1,37 @@
+From 5bc860ac3782969fd90b37367ebc6691b41c8c68 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Thu, 31 Mar 2022 12:44:44 -0400
+Subject: [PATCH 3/3] tpm2: Initialize variable reported by Coverity (false
+ positive)
+
+Initialize a variable in ExecuteCommand following Coverity report
+CID 1461252.
+
+Down the callpath as reported in CID 1461252 in
+TPMI_ST_COMMAND_TAG_Unmarshal() the passed-in value of
+TPMI_ST_COMMAND_TAG *target is stored and possibly restored later on in
+case of failure. Coverity complains that the variable is uninitialized.
+While this is correct, there's no harm reading the uninitialized value
+from the structure and possibly restoring it later on while not doing
+anything else with it otherwise. Therefore, it's a false positive.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm2/ExecCommand.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/tpm2/ExecCommand.c b/src/tpm2/ExecCommand.c
+index f21934b..cb9cea7 100644
+--- a/src/tpm2/ExecCommand.c
++++ b/src/tpm2/ExecCommand.c
+@@ -148,6 +148,7 @@ ExecuteCommand(
+     if(g_DRTMHandle != TPM_RH_UNASSIGNED)
+ 	ObjectTerminateEvent();
+     // Get command buffer size and command buffer.
++    command.tag = 0;				// libtpms added: Coverity
+     command.parameterBuffer = request;
+     command.parameterSize = requestSize;
+     // Parse command header: tag, commandSize and command.code.
+-- 
+2.31.1
+

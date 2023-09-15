@@ -1,17 +1,28 @@
-%global package_speccommit 951b2cc5b986544da7243030a7c38476e76dee27
-%global usver 0.9.5
+%global package_speccommit 721a597b0947c060ddbb89d3ae2a667dbbd0f9ac
+%global usver 0.9.6
 %global xsver 1
 %global xsrel %{xsver}%{?xscount}%{?xshash}
-%global package_srccommit v0.9.5
+%global package_srccommit v0.9.6
 
 Summary: Library providing Trusted Platform Module (TPM) functionality
 Name:           libtpms
-Version:        0.9.5
+Version:        0.9.6
 Release:        %{?xsrel}%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Url:            http://sourceforge.net/projects/ibmswtpm
-Source0: libtpms-0.9.5.tar.gz
+Source0: libtpms-0.9.6.tar.gz
+Patch0: 0001-tpm2-Initialize-variable-reported-by-Coverity-false-.patch
+Patch1: 0002-tpm2-Initialize-variable-reported-by-Coverity-false-.patch
+Patch2: 0003-tpm2-Initialize-variable-reported-by-Coverity-false-.patch
+Patch3: 0004-tpm2-Require-TPM_NV_DISK-to-avoid-case-of-tpm_stata_.patch
+Patch4: 0005-nvfile-Free-allocated-memory-on-failure.patch
+Patch5: 0006-tpm2-Assign-result-of-OsslToTpmBn-to-OK.patch
+Patch6: 0007-tpm2-Expect-TPM_SUCCESS-from-tpm_io_getlocality-call.patch
+Patch7: 0008-man-Update-description-of-tpm_io_getlocality-callbac.patch
+Patch8: 0009-tpm2-Access-entrysize-variable-only-if-it-was-read-f.patch
+Patch9: 0010-tpm2-Do-not-access-variable-if-it-could-not-be-read-.patch
+Patch10: 0001-tpm2-Check-size-of-TPM2B_NAME-buffer-before-reading-.patch
 
 BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig gawk sed
@@ -63,6 +74,10 @@ find %{buildroot} -type f -name '*.la' | xargs rm -f -- || :
 %{?_cov_results_package}
 
 %changelog
+* Wed Mar 01 2023 Ross Lagerwall <ross.lagerwall@citrix.com> - 0.9.6-1
+- Update libtpms to v0.9.6 to fix CVE-2023-1017 & -1018
+- Backport static analysis fixes
+
 * Wed Aug 17 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 0.9.5-1
 - Update libtpms to v0.9.5 to fix a couple of Coverity issues
 

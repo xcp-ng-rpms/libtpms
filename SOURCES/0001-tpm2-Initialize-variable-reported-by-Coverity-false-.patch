@@ -1,0 +1,41 @@
+From ec873cf8a2b594a4bb504429c390b880050e4aaf Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Thu, 31 Mar 2022 10:23:31 -0400
+Subject: [PATCH 1/1] tpm2: Initialize variable reported by Coverity (false
+ positive)
+
+Initialize a variable in USER_NVRAM_Unmarshal() follow Coverity
+report CID 1470812.
+
+Down the callpath as reported in CID 1470812 in TPMA_NV_Unmarshal() the
+passed-in value of TPMA_NV *target is stored and possibly restored later
+on in case of failure. Coverity complains that the variable is
+uninitialized. While this is correct, there's no harm reading the
+uninitialized value from the structure and possibly restoring it later
+on while not doing anything else with it otherwise. Therefore, it's a
+false positive.
+
+Resolves: https://github.com/stefanberger/libtpms/issues/310
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm2/NVMarshal.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/tpm2/NVMarshal.c b/src/tpm2/NVMarshal.c
+index cc3b065..4b88cf9 100644
+--- a/src/tpm2/NVMarshal.c
++++ b/src/tpm2/NVMarshal.c
+@@ -4613,7 +4613,9 @@ USER_NVRAM_Unmarshal(BYTE **buffer, INT32 *size)
+     NV_REF entryRef = NV_USER_DYNAMIC;
+     UINT32 entrysize;
+     UINT64 offset, o = 0;
+-    NV_INDEX nvi;
++    NV_INDEX nvi = {
++        .publicArea.attributes = 0, // Coverity
++    };
+     UINT64 maxCount;
+     TPM_HANDLE handle;
+     OBJECT obj;
+-- 
+2.31.1
+

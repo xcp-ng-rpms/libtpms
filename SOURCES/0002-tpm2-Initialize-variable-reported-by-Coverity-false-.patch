@@ -1,0 +1,41 @@
+From fbf413ec862fa93879502207d279b00fddc0ef98 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Thu, 31 Mar 2022 10:30:04 -0400
+Subject: [PATCH 2/2] tpm2: Initialize variable reported by Coverity (false
+ positive)
+
+Initialize a variable in TPM2_PolicyAuthorizeNV() following Coverity
+report CID 1470811.
+
+Down the callpath as reported in CID 1470811 in TPMI_ALG_HASH_Unmarshal()
+the passed-in value of TPMI_ALG_HASH *target is stored and possibly
+restored later on in case of failure. Coverity complains that the variable
+is uninitialized. While this is correct, there's no harm reading the
+uninitialized value from the structure and possibly restoring it later
+on while not doing anything else with it otherwise. Therefore, it's a
+false positive.
+
+Resolves: https://github.com/stefanberger/libtpms/issues/311
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm2/EACommands.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/tpm2/EACommands.c b/src/tpm2/EACommands.c
+index abf6074..8cef60b 100644
+--- a/src/tpm2/EACommands.c
++++ b/src/tpm2/EACommands.c
+@@ -1116,7 +1116,9 @@ TPM2_PolicyAuthorizeNV(
+     NV_REF                   locator;
+     NV_INDEX                *nvIndex = NvGetIndexInfo(in->nvIndex, &locator);
+     TPM2B_NAME               name;
+-    TPMT_HA                  policyInNv;
++    TPMT_HA                  policyInNv = {
++                                 .hashAlg = 0, // libpms added: Coverity
++                             };
+     BYTE                     nvTemp[sizeof(TPMT_HA)];
+     BYTE                    *buffer = nvTemp;
+     INT32                    size;
+-- 
+2.31.1
+

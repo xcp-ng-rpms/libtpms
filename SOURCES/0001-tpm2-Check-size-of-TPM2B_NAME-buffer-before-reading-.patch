@@ -1,0 +1,31 @@
+From 92f470c1b0a50bd6d85676a7c7ae368d8da869fe Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Tue, 28 Feb 2023 16:21:19 -0500
+Subject: [PATCH] tpm2: Check size of TPM2B_NAME buffer before reading 2 bytes
+ from it
+
+Fix the missing buffer size check that the TPM 2 errata v1.4 mentions in
+2.6.2 by adding a buffer size check before reading 2 bytes from a
+TPM2B_NAME buffer. There's no known CVE for this.
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm2/EACommands.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/tpm2/EACommands.c b/src/tpm2/EACommands.c
+index 8cef60b..60b4c17 100644
+--- a/src/tpm2/EACommands.c
++++ b/src/tpm2/EACommands.c
+@@ -892,6 +892,8 @@ TPM2_PolicyAuthorize(
+     // Get pointer to the session structure
+     session = SessionGet(in->policySession);
+     // Extract from the Name of the key, the algorithm used to compute it's Name
++    if (in->keySign.t.size < 2)		// libtpms added: TPM 2 Errata v1.4
++        return TPM_RC_INSUFFICIENT;	// libtpms added
+     hashAlg = BYTE_ARRAY_TO_UINT16(in->keySign.t.name);
+     // 'keySign' parameter needs to use a supported hash algorithm, otherwise
+     // can't tell how large the digest should be
+-- 
+2.31.1
+

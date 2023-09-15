@@ -1,0 +1,27 @@
+From 3b047cb5fe836dc172a539fcd6e00215c1437578 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Thu, 26 May 2022 12:33:11 -0400
+Subject: [PATCH 6/6] tpm2: Assign result of OsslToTpmBn to OK
+
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm2/crypto/openssl/Helpers.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/tpm2/crypto/openssl/Helpers.c b/src/tpm2/crypto/openssl/Helpers.c
+index 61fcc09..e9c1dcf 100644
+--- a/src/tpm2/crypto/openssl/Helpers.c
++++ b/src/tpm2/crypto/openssl/Helpers.c
+@@ -319,8 +319,7 @@ OpenSSLEccGetPrivate(
+                 }
+                 // result is sufficient
+             }
+-            OK = TRUE;
+-            OsslToTpmBn(dOut, D);
++            OK = OsslToTpmBn(dOut, D);
+         }
+         break;
+     }
+-- 
+2.31.1
+

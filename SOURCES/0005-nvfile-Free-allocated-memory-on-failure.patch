@@ -1,0 +1,37 @@
+From 71d3a27bc79142dd2d1bc81c9d0300b89da193ee Mon Sep 17 00:00:00 2001
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Fri, 20 May 2022 12:00:57 +0100
+Subject: [PATCH 5/5] nvfile: Free allocated memory on failure
+
+In TPM_NVRAM_LoadData(), there is an unlikely path where the function
+will return an error code but still expect the caller to free the
+allocated data. At least some of the callers don't handle this correctly
+so ensure that the caller only needs to free data if the function
+returns success.
+
+Reported by Coverity.
+
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+---
+ src/tpm_nvfile.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/tpm_nvfile.c b/src/tpm_nvfile.c
+index 770e618..2bd4d28 100644
+--- a/src/tpm_nvfile.c
++++ b/src/tpm_nvfile.c
+@@ -267,6 +267,11 @@ TPM_RESULT TPM_NVRAM_LoadData(unsigned char **data,     /* freed by caller */
+             printf(" TPM_NVRAM_LoadData: Closed file %s\n", filename);
+         }
+     }
++
++    if (rc) {
++        free(*data);
++        *data = NULL;
++    }
+     return rc;
+ }
+ 
+-- 
+2.31.1
+

@@ -1,0 +1,32 @@
+From 73fca84031909623afc39a8dada9ee9ef1bd6c3b Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.ibm.com>
+Date: Fri, 1 Apr 2022 08:41:30 -0400
+Subject: [PATCH 4/4] tpm2: Require TPM_NV_DISK to avoid case of tpm_stata_path
+ being NULL
+
+Address an issue reported by cppcheck that raises the issue that
+tpm_state_path could be NULL when the #define TPM_NV_DISK is not set.
+Require that the #define TPM_NV_DISK always be set.
+
+Resolves: https://github.com/stefanberger/libtpms/issues/313
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ src/tpm_nvfile.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/tpm_nvfile.c b/src/tpm_nvfile.c
+index d9049e8..770e618 100644
+--- a/src/tpm_nvfile.c
++++ b/src/tpm_nvfile.c
+@@ -123,6 +123,8 @@ TPM_RESULT TPM_NVRAM_Init(void)
+             rc = TPM_FAIL;
+         }
+     }
++#else
++# error TPM_NV_DISK must be defined
+ #endif
+     /* check that the directory name plus a file name will not overflow FILENAME_MAX */
+     if (rc == 0) {
+-- 
+2.31.1
+
