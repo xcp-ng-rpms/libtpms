@@ -1,6 +1,6 @@
-%global package_speccommit 721a597b0947c060ddbb89d3ae2a667dbbd0f9ac
+%global package_speccommit eb8a97c21541f319e86f827c87aa141df178ccb9
 %global usver 0.9.6
-%global xsver 1
+%global xsver 3
 %global xsrel %{xsver}%{?xscount}%{?xshash}
 %global package_srccommit v0.9.6
 
@@ -23,6 +23,7 @@ Patch7: 0008-man-Update-description-of-tpm_io_getlocality-callbac.patch
 Patch8: 0009-tpm2-Access-entrysize-variable-only-if-it-was-read-f.patch
 Patch9: 0010-tpm2-Do-not-access-variable-if-it-could-not-be-read-.patch
 Patch10: 0001-tpm2-Check-size-of-TPM2B_NAME-buffer-before-reading-.patch
+Patch11: tpm2-Fix-potential-out-of-bound-access-abort-due-to-.patch
 
 BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig gawk sed
@@ -74,6 +75,12 @@ find %{buildroot} -type f -name '*.la' | xargs rm -f -- || :
 %{?_cov_results_package}
 
 %changelog
+* Fri Jun 13 2025 Ross Lagerwall <ross.lagerwall@citrix.com> - 0.9.6-3
+- CA-412377: Fix potential OOB access (CVE-2025-49133)
+
+* Mon Mar 10 2025 Deli Zhang <deli.zhang@cloud.com> - 0.9.6-2
+- CP-53516: Rebuild with OpenSSL 3 for XS8
+
 * Wed Mar 01 2023 Ross Lagerwall <ross.lagerwall@citrix.com> - 0.9.6-1
 - Update libtpms to v0.9.6 to fix CVE-2023-1017 & -1018
 - Backport static analysis fixes
