@@ -7,7 +7,7 @@
 Summary: Library providing Trusted Platform Module (TPM) functionality
 Name:           libtpms
 Version:        0.9.6
-Release:        %{?xsrel}%{?dist}
+Release:        %{?xsrel}.1%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Url:            http://sourceforge.net/projects/ibmswtpm
@@ -75,6 +75,9 @@ find %{buildroot} -type f -name '*.la' | xargs rm -f -- || :
 %{?_cov_results_package}
 
 %changelog
+* Tue Jan 20 2026 Philippe Coval <philippe.coval@vates.tech> - 0.9.6-3.1
+- Rebuild for openssl-3
+
 * Fri Jun 13 2025 Ross Lagerwall <ross.lagerwall@citrix.com> - 0.9.6-3
 - CA-412377: Fix potential OOB access (CVE-2025-49133)
 
