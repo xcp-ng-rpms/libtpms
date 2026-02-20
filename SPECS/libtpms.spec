@@ -7,7 +7,7 @@
 Summary: Library providing Trusted Platform Module (TPM) functionality
 Name:           libtpms
 Version:        0.9.6
-Release:        %{?xsrel}.1%{?dist}
+Release:        %{?xsrel}.1~XCPNG2710.3%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Url:            http://sourceforge.net/projects/ibmswtpm
